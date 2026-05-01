@@ -50,19 +50,6 @@
     overflow-x: hidden;
     margin: 0;
     -webkit-font-smoothing: antialiased;
-    cursor: none;
-    /* Hide default cursor generally */
-  }
-
-  /* Restore default cursor for interactive elements */
-  a,
-  button,
-  input,
-  textarea,
-  select,
-  [role="button"],
-  .cursor-pointer {
-    cursor: pointer;
   }
 
   /* Custom Scrollbar */

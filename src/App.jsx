@@ -9,7 +9,7 @@ import About from './components/sections/About';
 import Services from './components/sections/Services';
 import SelectedWorks from './components/hero/SelectedWorks';
 import Contact from './components/sections/Contact';
-import CustomCursor from './components/ui/CustomCursor';
+import ExploreSocials from './components/sections/ExploreSocials';
 import Loader from './components/ui/Loader';
 import Footer from './components/sections/Footer';
 
@@ -47,7 +47,6 @@ function App() {
     // Updated background and selection colors to match Monotree theme
     <div className="bg-[#0D0F11] min-h-screen text-neutral-900 selection:bg-[#86EFAC] selection:text-black relative">
       <Loader onComplete={() => setIsLoading(false)} />
-      <CustomCursor />
 
 
 
@@ -74,6 +73,8 @@ function App() {
         <section id="projects" className="w-full max-w-[1440px] mx-auto px-6 md:px-8 pb-32">
           <SelectedWorks />
         </section>
+
+        <ExploreSocials />
 
         <section id="contact">
           <Contact />
