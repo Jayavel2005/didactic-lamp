@@ -339,7 +339,7 @@ const AntiGravityHero = () => {
                 <div className="w-full flex flex-col md:items-center relative">
 
                     {/* Freelance Availability Badge */}
-                    <div className="mb-6 inline-flex items-center gap-2 bg-white/50 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                    <div className="mb-6 inline-flex items-center gap-2 bg-white/70 backdrop-blur-sm border border-slate-200 px-4 py-2 rounded-full shadow-sm">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -347,21 +347,21 @@ const AntiGravityHero = () => {
                         <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Available for Freelance</span>
                     </div>
 
-                    {/* Magnetic Headline */}
+                    {/* Headline — tighter on mobile */}
                     <Magnetic>
-                        <h1 ref={nameRef} className="text-[12vw] md:text-[8.5vw] font-black text-slate-900 leading-[0.85] tracking-tighter cursor-default md:-ml-[15%]">
+                        <h1 ref={nameRef} className="text-[15vw] sm:text-[11vw] md:text-[8.5vw] font-black text-slate-900 leading-[0.88] tracking-tighter cursor-default md:-ml-[15%]">
                             {nameWords.map((word, i) => (
-                                <span key={i} className="char-word inline-block mr-[0.2em] transform origin-bottom hover:text-slate-700 transition-colors" onMouseEnter={handleWordHover}>
+                                <span key={i} className="char-word inline-block mr-[0.15em] transform origin-bottom hover:text-slate-700 transition-colors" onMouseEnter={handleWordHover}>
                                     {word}
                                 </span>
                             ))}
                         </h1>
                     </Magnetic>
 
-                    {/* Subheadline */}
+                    {/* Subheadline — readable on mobile */}
                     <Magnetic>
-                        <div ref={subRef} className="mt-6 md:mt-2 md:ml-[25%] cursor-default">
-                            <p className="text-[5vw] md:text-[3.5vw] font-medium text-slate-600 tracking-tight leading-tight">
+                        <div ref={subRef} className="mt-5 md:mt-2 md:ml-[25%] cursor-default">
+                            <p className="text-[5.5vw] sm:text-[4vw] md:text-[3.5vw] font-medium text-slate-500 tracking-tight leading-snug">
                                 I build <span className="relative inline-block text-slate-900 font-bold group">custom digital
                                     <span ref={underlineRef} className="absolute bottom-0 left-0 w-full h-[0.15em] bg-[#4ade80] rounded-full origin-left opacity-80 group-hover:drop-shadow-[0_0_8px_rgba(74,222,128,0.8)] transition-all duration-300" />
                                 </span><br className="hidden md:block" /> client solutions.
@@ -369,16 +369,34 @@ const AntiGravityHero = () => {
                         </div>
                     </Magnetic>
 
-                    {/* CTA Button */}
-                    <div ref={ctaRef} className="mt-16 flex flex-col items-center gap-4">
+                    {/* Mobile-only stats strip */}
+                    <div className="flex md:hidden items-center justify-center gap-6 mt-8 w-full">
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-black text-slate-900">10+</span>
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Projects</span>
+                        </div>
+                        <div className="w-px h-8 bg-slate-200" />
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-black text-slate-900">5.0</span>
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Rating</span>
+                        </div>
+                        <div className="w-px h-8 bg-slate-200" />
+                        <div className="flex flex-col items-center">
+                            <span className="text-2xl font-black text-slate-900">100%</span>
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Success</span>
+                        </div>
+                    </div>
+
+                    {/* CTA Buttons */}
+                    <div ref={ctaRef} className="mt-10 md:mt-16 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                         <Magnetic>
                             <button
                                 onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="group relative px-10 py-4 rounded-full bg-slate-900 text-white font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 hover:rotate-1 hover:shadow-[0_20px_40px_-10px_rgba(74,222,128,0.4)]"
+                                className="group relative w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 text-white font-bold text-base overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_20px_40px_-10px_rgba(74,222,128,0.4)]"
                             >
                                 <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-[#4ade80]/50 transition-colors duration-500" />
                                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full scale-50 group-hover:scale-100 blur-xl" />
-                                <span className="relative z-10 flex items-center gap-3">
+                                <span className="relative z-10 flex items-center justify-center gap-3">
                                     View My Work <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </span>
                             </button>
@@ -386,9 +404,9 @@ const AntiGravityHero = () => {
 
                         <button
                             onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="text-sm font-semibold text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-1 group mt-2"
+                            className="w-full sm:w-auto px-8 py-4 rounded-full border border-slate-200 bg-white/60 backdrop-blur-sm text-slate-700 font-semibold text-base hover:bg-white hover:border-slate-300 hover:text-slate-900 transition-all duration-300 active:scale-95"
                         >
-                            Contact Me <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                            Contact Me →
                         </button>
                     </div>
                 </div>
