@@ -10,6 +10,8 @@ import Services from './components/sections/Services';
 import SelectedWorks from './components/hero/SelectedWorks';
 import Contact from './components/sections/Contact';
 import ExploreSocials from './components/sections/ExploreSocials';
+import SignatureMoment from './components/sections/SignatureMoment';
+import Skills from './components/sections/Skills';
 import Loader from './components/ui/Loader';
 import Footer from './components/sections/Footer';
 
@@ -63,6 +65,12 @@ function App() {
 
         <section id="about">
           <About />
+        </section>
+
+        <SignatureMoment />
+
+        <section id="skills">
+          <Skills />
         </section>
 
         {/* Services Section */}
