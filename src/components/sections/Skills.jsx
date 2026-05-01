@@ -1,9 +1,7 @@
-import React, { useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, useMotionValue } from 'framer-motion';
 import { Code2, Layers, Server, Database, GitBranch, Globe, Smartphone, Palette, Cpu, Zap, Box, Terminal, Sparkles } from 'lucide-react';
-import { PhysicsEngine } from '../../lib/physics';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,49 +26,30 @@ const SKILLS = [
 
 const CATS = ['All', 'Frontend', 'Backend', 'Design', 'Tools'];
 
-// ── PHYSICS-DRIVEN SKILL PILL ──────────────────────────────────────────────────
-const SkillPill = ({ skill, index, engine }) => {
+const SkillPill = ({ skill, index }) => {
+    const wrapperRef = useRef(null);
     const pillRef = useRef(null);
     const glowRef = useRef(null);
     
-    // Framer Motion values managed entirely by the Physics Engine
-    const floatDuration = 3 + (index % 3) * 0.5;
-    const floatDelay = (index % 4) * 0.4;
-    const mt = (index % 3) * 12; // Tighter staggering to prevent overlaps but keep close
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    useEffect(() => {
-        if (!pillRef.current) return;
-        
-        // Wait one frame to ensure DOM layout has settled so we can grab true origin
-        const timer = requestAnimationFrame(() => {
-            if (!pillRef.current) return;
-            const originX = pillRef.current.offsetLeft;
-            const originY = pillRef.current.offsetTop;
-            
-            engine.addEntity(skill.name, {
-                x: originX,
-                y: originY,
-                mass: 1 + Math.random() * 0.8, // Variable mass for emergent physics
-                radius: 80, // Collision radius
-                onUpdate: (currX, currY) => {
-                    // Update framer-motion values with offset from origin
-                    x.set(currX - originX);
-                    y.set(currY - originY);
+    useLayoutEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.to(wrapperRef.current, {
+                yPercent: -12, // Subtle upward drift
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: wrapperRef.current,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1 + (index % 4) * 0.25 // Staggered scrub speed creates depth
                 }
             });
-        });
-        
-        return () => {
-            cancelAnimationFrame(timer);
-            engine.removeEntity(skill.name);
-        };
-    }, [engine, skill.name, x, y]);
-
-    // Subtle 3D tilt purely for aesthetics (no impact on physics)
+        }, wrapperRef);
+        return () => ctx.revert();
+    }, [index]);
+    
+    // Subtle 3D tilt purely for aesthetics
     const handleMouseMove = (e) => {
-        if (!pillRef.current) return;
+        if (!pillRef.current || !wrapperRef.current) return;
         const rect = pillRef.current.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
@@ -81,36 +60,77 @@ const SkillPill = ({ skill, index, engine }) => {
         gsap.to(pillRef.current, {
             rotateX: -yPct * 25,
             rotateY: xPct * 25,
-            duration: 0.4,
-            ease: 'power2.out',
+            duration: 0.1,
+            ease: 'none',
             transformPerspective: 800,
             overwrite: 'auto'
         });
 
         gsap.to(glowRef.current, {
-            x: mx, y: my, opacity: 1, duration: 0.2, overwrite: 'auto'
+            x: mx, y: my, opacity: 1, duration: 0.1, overwrite: 'auto'
         });
-    };
 
-    const handleMouseEnter = () => {
-        engine.setHoveredEntity(skill.name);
+        // Dynamic fluid collision based on EXACT mouse position
+        const cx = e.clientX;
+        const cy = e.clientY;
+        const siblings = document.querySelectorAll('.sk-card-wrapper');
+        
+        siblings.forEach(sibling => {
+            if (sibling === wrapperRef.current) return;
+            const sRect = sibling.getBoundingClientRect();
+            
+            // Get center of sibling
+            const scx = sRect.left + sRect.width / 2;
+            const scy = sRect.top + sRect.height / 2;
+
+            const dx = scx - cx;
+            const dy = scy - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            const influenceRadius = 240; 
+            if (dist < influenceRadius && dist > 0) {
+                const force = Math.pow((influenceRadius - dist) / influenceRadius, 1.2);
+                const pushX = (dx / dist) * force * 55; 
+                const pushY = (dy / dist) * force * 55;
+                
+                gsap.to(sibling, {
+                    x: pushX,
+                    y: pushY,
+                    duration: 0.08, // Near instantaneous tracking
+                    ease: 'none',
+                    overwrite: 'auto'
+                });
+            } else {
+                // Instantly snap back if out of radius
+                if (gsap.getProperty(sibling, "x") !== 0) {
+                    gsap.to(sibling, { x: 0, y: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+                }
+            }
+        });
     };
 
     const handleMouseLeave = () => {
-        engine.setHoveredEntity(null);
         if (!pillRef.current) return;
         gsap.to(pillRef.current, {
-            rotateX: 0, rotateY: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)', overwrite: 'auto'
+            rotateX: 0, rotateY: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto'
         });
-        gsap.to(glowRef.current, { opacity: 0, duration: 0.4, overwrite: 'auto' });
+        gsap.to(glowRef.current, { opacity: 0, duration: 0.2, overwrite: 'auto' });
+
+        // Spring siblings back to center instantly
+        const siblings = document.querySelectorAll('.sk-card-wrapper');
+        gsap.to(siblings, {
+            x: 0,
+            y: 0,
+            duration: 0.3,
+            ease: 'power2.out',
+            overwrite: 'auto'
+        });
     };
 
     return (
-        <div className="sk-card-wrapper z-10 hover:z-20" style={{ marginTop: mt }}>
-            <motion.div
+        <div ref={wrapperRef} className="sk-card-wrapper z-10 hover:z-20 transition-transform duration-300">
+            <div
                 ref={pillRef}
-                style={{ x, y }} // Driven by physics via Framer Motion
-                onMouseEnter={handleMouseEnter}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 className="sk-card group relative flex items-center gap-4 bg-white border border-neutral-100 rounded-3xl px-6 py-4 cursor-pointer will-change-transform overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
@@ -140,46 +160,16 @@ const SkillPill = ({ skill, index, engine }) => {
                 
                 {/* Bottom accent line */}
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out origin-left z-10" style={{ background: skill.color }} />
-            </motion.div>
+            </div>
         </div>
     );
 };
-
 
 const Skills = () => {
     const [active, setActive] = useState('All');
     const sectionRef = useRef(null);
     const headRef    = useRef(null);
     const gridRef    = useRef(null);
-
-    // Initialize Physics Engine once
-    const engine = useMemo(() => new PhysicsEngine({
-        friction: 0.85,             // Slightly lower friction for more fluid sliding
-        attractionStrength: 6.0,    // Pull back to grid
-        repulsionStrength: 60000,   // Lowered to allow tighter grouping
-        mouseRadius: 250,           // Area of effect for mouse cursor
-        mouseRepulsion: 180000      // Strength of mouse repel/attract
-    }), []);
-
-    useEffect(() => {
-        engine.start();
-        
-        // Inject global inertia based on scroll velocity
-        let lastScrollY = window.scrollY;
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            const dy = currentScrollY - lastScrollY;
-            lastScrollY = currentScrollY;
-            // Push entities in the opposite direction of scroll for inertia effect
-            engine.applyGlobalForce(0, dy * -2.5);
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-
-        return () => {
-            engine.stop();
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [engine]);
 
     const filtered = active === 'All' ? SKILLS : SKILLS.filter(s => s.cat === active);
 
@@ -209,35 +199,16 @@ const Skills = () => {
         return () => ctx.revert();
     }, []);
 
-    // Re-animate list on tab change with Physics Explosion
+    // Re-animate list on tab change
     const handleTab = (tab) => {
-        // 1. Blast current items away from center
-        engine.blastFromCenter(6000); 
-        
-        // 2. Wait a split second for the explosion to play out, then switch data
-        setTimeout(() => {
-            setActive(tab);
-            requestAnimationFrame(() => {
-                if (!gridRef.current) return;
-                // Fade in new items (do not translate Y, let physics handle position)
-                gsap.fromTo(gridRef.current.querySelectorAll('.sk-card'),
-                    { opacity: 0, scale: 0.8 },
-                    { opacity: 1, scale: 1, stagger: 0.04, duration: 0.6, ease: 'back.out(1.5)' }
-                );
-            });
-        }, 150);
-    };
-
-    // Global Mouse Handlers for Physics Environment
-    const handleGridMouseMove = (e) => {
-        if (!gridRef.current) return;
-        const rect = gridRef.current.getBoundingClientRect();
-        engine.updateMouse(e.clientX - rect.left, e.clientY - rect.top);
-    };
-
-    const handleGridMouseLeave = () => {
-        engine.updateMouse(-9999, -9999);
-        engine.setMouseDown(false);
+        setActive(tab);
+        requestAnimationFrame(() => {
+            if (!gridRef.current) return;
+            gsap.fromTo(gridRef.current.querySelectorAll('.sk-card'),
+                { y: 30, opacity: 0, scale: 0.94 },
+                { y: 0, opacity: 1, scale: 1, stagger: 0.04, duration: 0.55, ease: 'expo.out' }
+            );
+        });
     };
 
     return (
@@ -272,22 +243,11 @@ const Skills = () => {
                 </div>
             </div>
 
-            {/* ── PHYSICS GRID ENVIRONMENT ── */}
-            <div 
-                ref={gridRef} 
-                className="max-w-7xl mx-auto px-6 md:px-20 mb-14 relative" 
-                style={{ perspective: '1200px' }}
-                onMouseMove={handleGridMouseMove}
-                onMouseLeave={handleGridMouseLeave}
-                onMouseDown={() => engine.setMouseDown(true)}
-                onMouseUp={() => engine.setMouseDown(false)}
-            >
-                <div className="flex flex-wrap items-start gap-2 md:gap-3 py-6 pointer-events-none">
-                    {/* Inner wrapper pointer-events-none, but children pointer-events-auto */}
+            {/* ── GRID ENVIRONMENT ── */}
+            <div ref={gridRef} className="max-w-7xl mx-auto px-6 md:px-20 mb-14 relative" style={{ perspective: '1200px' }}>
+                <div className="flex flex-wrap items-start gap-4 md:gap-5 py-6">
                     {filtered.map((skill, index) => (
-                        <div key={skill.name} className="pointer-events-auto">
-                            <SkillPill skill={skill} index={index} engine={engine} />
-                        </div>
+                        <SkillPill key={skill.name} skill={skill} index={index} />
                     ))}
                 </div>
             </div>
