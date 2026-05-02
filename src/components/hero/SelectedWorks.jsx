@@ -1,20 +1,21 @@
 import React, { useRef, useLayoutEffect } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Github, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/button';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import roomifyImg from '../../assets/roomify.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
     {
-        title: "Neon Nexus",
-        description: "A futuristic fintech dashboard built for real-time crypto high-frequency trading.",
-        tags: ["React", "D3.js", "WebSockets"],
+        title: "Roomify",
+        description: "A modern web application built with React and Puter.js for scalable cloud capabilities.",
+        tags: ["React", "TypeScript", "Tailwind CSS", "Puter", "Puter.js"],
         year: "2024",
         color: "#1E1E1E",
-        img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
+        img: roomifyImg
     },
     {
         title: "Zenith OS",
@@ -80,28 +81,36 @@ const Card = ({ project, index, range, targetScale }) => {
                     <div className="mt-6 lg:mt-8 pb-4 lg:pb-0">
                         <div className="flex flex-wrap gap-2 mb-6 lg:mb-8">
                             {tags.map((tag, i) => (
-                                <span key={i} className="text-[10px] lg:text-xs font-medium text-white/40 bg-white/5 px-2 py-1 lg:px-3 lg:py-1.5 rounded-md">
-                                    #{tag}
+                                <span key={i} className="text-[10px] lg:text-xs font-medium text-white/70 bg-white/5 border border-white/10 px-3 py-1.5 lg:px-4 lg:py-2 rounded-full backdrop-blur-sm shadow-sm hover:bg-white/10 hover:text-white hover:-translate-y-0.5 transition-all duration-300">
+                                    {tag}
                                 </span>
                             ))}
                         </div>
 
-                        <button className="group flex items-center gap-2 lg:gap-3 text-white font-semibold hover:text-emerald-400 transition-colors text-sm lg:text-base">
-                            View Case Study
-                            <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all">
-                                <ArrowUpRight size={14} className="lg:w-4 lg:h-4" />
-                            </div>
-                        </button>
+                        <div className="flex items-center gap-4 lg:gap-6">
+                            <button className="group flex items-center gap-2 lg:gap-3 text-white font-semibold hover:text-emerald-400 transition-colors text-sm lg:text-base">
+                                Live Demo
+                                <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all">
+                                    <ExternalLink size={14} className="lg:w-4 lg:h-4" />
+                                </div>
+                            </button>
+                            <button className="group flex items-center gap-2 lg:gap-3 text-white font-semibold hover:text-white transition-colors text-sm lg:text-base">
+                                GitHub
+                                <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all">
+                                    <Github size={14} className="lg:w-4 lg:h-4" />
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Right Image - HIDDEN ON MOBILE */}
                 <div className="hidden lg:block w-full lg:w-3/5 relative h-full overflow-hidden group order-1 lg:order-2">
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500 z-10" />
                     <img
                         src={img}
                         alt={title}
-                        className="w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform duration-700 ease-out brightness-125"
                     />
                 </div>
             </div>
